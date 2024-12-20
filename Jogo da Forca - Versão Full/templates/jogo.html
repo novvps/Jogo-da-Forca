@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Forca</title>
+    <link rel="stylesheet" href="{{ url_for ('static', filename='css/jogo.css')}}">
+
+</head>
+<body>
+        <!-- Mostrar as mensagens flash -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+    <!-- As chaves servem para implantarmos variáveis que são de outra linguagem, no nosso caso python -->
+    <h2>Dica da palavra: {{ dica }}</h2> <!-- Pega a variável dica que foi colhida nos argumentos da url e mostra para o usuário -->
+    <h2>{{ palavra_escondida }}</h2> <!-- A mesma coisa com a variável palavra_escondida -->
+    <br>
+    <form action="{{ url_for('jogo') }}" method="post">
+        <label for="palpite">Digite uma letra :</label>
+        <input type="text" id="palpite" name="palpite" required autocomplete="off"><br><br>
+        <button type="submit">Enviar</button>
+    </form>
+    
+</body>
+</html>
