@@ -25,6 +25,7 @@ def index(): # defino index
 @app.route('/jogo', methods=['GET', 'POST']) # mesmo esquema da rota acima
 def jogo(): # é definido
     palavra = session.get('palavra') # pegamos o session que foi passado lá em cima com o get
+    quantidade = len(palavra)
     dica = session.get('dica')
     palavra_escondida = session.get('palavra_escondida')
     chances = session.get('chances')
@@ -65,7 +66,7 @@ def jogo(): # é definido
 
         session['letras_tentadas'] = letras_tentadas # salvamos as letras usadas em sua sessão
 
-    return render_template('jogo.html', palavra_escondida=''.join(palavra_escondida), dica=dica, chances=chances, letras_tentadas=letras_tentadas) # levamos todas essas variáveis para o html
+    return render_template('jogo.html', palavra_escondida=''.join(palavra_escondida), dica=dica, chances=chances, letras_tentadas=letras_tentadas, quantidade=quantidade) # levamos todas essas variáveis para o html
 
 # roda o código
 if __name__ == '__main__':
