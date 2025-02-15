@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Forca</title>
+    <link rel="stylesheet" href="{{ url_for ('static', filename='css/index.css')}}">
+</head>
+<body>
+            <!-- Mostrar as mensagens flash -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+    <center><h1>Jogo da Forca</h1></center><br> <!-- Título -->
+
+    <h2>Esse é o pré-jogo</h2> <!-- Subtítulo -->
+
+    <br><br>
+    
+    <form action="{{ url_for('index') }}" method="POST">
+
+        <label for="palavra">Digite uma palavra:</label>
+        <input type="text" id="palavra" name="palavra" required autocomplete="off"><br><br>
+
+        <label for="dica">Digite uma dica:</label>
+        <input type="text" id="dica" name="dica" required autocomplete="off"><br><br>
+
+        <button type="submit">Enviar</button> 
+
+    </form>
+</body>
+</html>
