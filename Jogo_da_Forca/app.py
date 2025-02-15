@@ -30,6 +30,7 @@ def jogo(): # é definido
     palavra_escondida = session.get('palavra_escondida')
     chances = session.get('chances')
     letras_tentadas = session.get('letras_tentadas')
+    chute = session.get('chute')
 
     if not palavra or not dica or palavra_escondida is None or chances is None: # caso os dados sejam inválidos ou vazios
         return redirect(url_for('index')) # a pessoa volta para a rota index
@@ -37,7 +38,11 @@ def jogo(): # é definido
     if request.method == 'POST':
         palpite = request.form.get('palpite') # pegamos o palpite que a pessoa deu, no mesmo esquema da dica e a palavra
 
-        if not palpite or len(palpite) != 1: # caso não tenha palpite ou seja mais de uma letra
+        if chute == palavra:
+            flash(f"Parabéns! Você acertou a palavra: {palavra}")
+            return redirect(url_for('index'))
+
+        if len(palpite)!= 1: # caso palpite seja mais de uma letra
             # o flash é uma função que funciona como um pop-up
             flash("Digite apenas uma letra!") # alertará dizendo que só pode uma letra
 

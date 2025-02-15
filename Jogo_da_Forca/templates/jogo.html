@@ -24,8 +24,12 @@
     <p>Quantidade de dígitos: {{ quantidade }}</p>
     <br>
     <form action="{{ url_for('jogo') }}" method="post">
-        <label for="palpite">Digite uma letra :</label>
-        <input type="text" id="palpite" name="palpite" required autocomplete="off"><br><br>
+        <label for="palpite">Digite uma letra:</label>
+        <input type="text" id="palpite" name="palpite" autocomplete="off"><br><br>
+        <button type="submit">Enviar</button>
+        <br><br><br>
+        <label for="chute">Digite a palavra:</label>
+        <input type="text" id="chute" name="chute" autocomplete="off"><br><br>
         <button type="submit">Enviar</button>
     </form>
     
