@@ -1,78 +1,89 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session # importa as funções do flask
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 
-app = Flask('__name__') # isso é padrão
-app.secret_key = 'DDS2JOGO' # chave de segurança para executar o session
+app = Flask('__name__')
+app.secret_key = 'DDS2JOGO'
 
-@app.route('/', methods=['GET', 'POST']) # crio uma rota principal com seus métodos
-@app.route('/index', methods=['GET', 'POST']) # na rota principal eu a nomeio de index
-def index(): # defino index
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
-        # pego os dados e transfiro para variáveis
-        palavra = request.form.get('palavra') # faço uma requisição do input nomeado de palavra, ou seja, name="palavra"
-        dica = request.form.get('dica') # a mesma coisa com a dica
+        palavra = request.form.get('palavra')
+        dica = request.form.get('dica')
 
-        if palavra and dica: # caso os dados sejam válidos
-            # criaremos sessões para cada informação, ou seja, ficará armazenado no site
-            session['palavra'] = palavra
+        if palavra and dica:
+            session['palavra'] = palavra.upper()  # Para garantir que tudo fique em maiúsculas
             session['dica'] = dica
-            session['palavra_escondida'] = ['-' for _ in palavra]  # Inicializa os traços
-            session['chances'] = len(palavra) + 2  # Define as chances
-            session['letras_tentadas'] = []  # Inicializa as letras tentadas
-            return redirect(url_for('jogo')) # redireciona para a rota jogo
+            session['palavra_escondida'] = ['-' for _ in palavra]
+            session['chances'] = len(palavra) + 2
+            session['letras_tentadas'] = []
+            return redirect(url_for('jogo'))
 
-    return render_template('index.html') # renderiza o template (html) do index
+    return render_template('index.html')
 
-@app.route('/jogo', methods=['GET', 'POST']) # mesmo esquema da rota acima
-def jogo(): # é definido
-    palavra = session.get('palavra') # pegamos o session que foi passado lá em cima com o get
+@app.route('/jogo', methods=['GET', 'POST'])
+def jogo():
+    palavra = session.get('palavra', '').upper()
     quantidade = len(palavra)
-    dica = session.get('dica')
-    palavra_escondida = session.get('palavra_escondida')
-    chances = session.get('chances')
-    letras_tentadas = session.get('letras_tentadas')
-    chute = session.get('chute')
+    dica = session.get('dica', '')
+    palavra_escondida = session.get('palavra_escondida', [])
+    chances = session.get('chances', 0)
+    letras_tentadas = session.get('letras_tentadas', [])
 
-    if not palavra or not dica or palavra_escondida is None or chances is None: # caso os dados sejam inválidos ou vazios
-        return redirect(url_for('index')) # a pessoa volta para a rota index
+    if not palavra or not dica:
+        return redirect(url_for('index'))
 
     if request.method == 'POST':
-        palpite = request.form.get('palpite') # pegamos o palpite que a pessoa deu, no mesmo esquema da dica e a palavra
+        tipo_palpite = request.form.get('tipo_palpite')  # Identifica o tipo de palpite
 
-        if chute == palavra:
-            flash(f"Parabéns! Você acertou a palavra: {palavra}")
+        if tipo_palpite == 'letra':  # Tentativa de uma única letra
+            palpite = request.form.get('palpite', '').upper()
+
+            if len(palpite) != 1 or not palpite.isalpha():
+                flash("Digite apenas UMA letra válida!")
+            elif palpite in letras_tentadas:
+                flash("Você já tentou essa letra.")
+            else:
+                letras_tentadas.append(palpite)
+                if palpite in palavra:
+                    flash("Letra correta!")
+                    for i, letra in enumerate(palavra):
+                        if letra == palpite:
+                            palavra_escondida[i] = palpite
+                else:
+                    chances -= 1
+                    flash(f"Letra incorreta. Você tem {chances} chances restantes.")
+
+        elif tipo_palpite == 'palavra':  # Tentativa de chutar a palavra inteira
+            chute = request.form.get('chute', '').upper()
+
+            if chute == palavra:
+                flash(f"Parabéns! Você acertou a palavra: {palavra}")
+                return redirect(url_for('index'))
+            else:
+                flash(f"Você errou! A palavra era: {palavra}")
+                return redirect(url_for('index'))
+
+        # Atualiza a sessão com os novos valores
+        session['palavra_escondida'] = palavra_escondida
+        session['chances'] = chances
+        session['letras_tentadas'] = letras_tentadas
+        session.modified = True
+
+        # Verifica se o jogador ganhou ou perdeu
+        if '-' not in palavra_escondida:
+            flash(f"Parabéns! Você descobriu a palavra: {palavra}")
+            return redirect(url_for('index'))
+        elif chances == 0:
+            flash(f"Você perdeu! A palavra era: {palavra}")
             return redirect(url_for('index'))
 
-        if len(palpite)!= 1: # caso palpite seja mais de uma letra
-            # o flash é uma função que funciona como um pop-up
-            flash("Digite apenas uma letra!") # alertará dizendo que só pode uma letra
+    return render_template('jogo.html', 
+        palavra_escondida=''.join(palavra_escondida), 
+        dica=dica, 
+        chances=chances, 
+        letras_tentadas=letras_tentadas, 
+        quantidade=quantidade
+    )
 
-        elif palpite in letras_tentadas: # caso o palpite esteja na lista de letras já usadas
-            flash("Você já tentou essa letra.") # alerta sobre isso
-        else: # caso contrário
-            letras_tentadas.append(palpite) # as letras usadas (palpites) ficarão armazenadas
-            if palpite in palavra: # se o palpite estiver na palavra
-                flash("Isso aí!") # a pessoa verá que acertou
-                # A função enumerate() do Python é usada para acessar o valor e o índice de cada elemento de uma lista, simultaneamente.
-                for i, letra in enumerate(palavra): # para cada índice
-                    if letra == palpite: # se a letra é igual ao palpite
-                        palavra_escondida[i] = palpite # vai substituir o traço no índice que corresponder com o palpite
-                session['palavra_escondida'] = palavra_escondida # salvamos/atualizamos a sessão da palavra escondida, assim quando atualizar a palavra não terá problemas com as letras
-            else: # porém, caso o palpite não esteja na palavra
-                chances -= 1 # as chances diminuem
-                session['chances'] = chances # salvamos/atualizamos a informação das chances em sua sessão correspondente
-                flash(f'Letra incorreta. Chances restantes: {chances}') # alerta sobre a letra incorreta e a quantidade de chances
-
-            if '-' not in palavra_escondida: # caso não haja nenhum outro traço, ou seja, a palavra estará completa
-                flash(f'Parabéns! Você acertou a palavra: {palavra}') # a pessoa irá ganhar o jogo
-                return redirect(url_for('index')) # e retornará ao início
-            elif chances == 0: # mas se suas chances acabarem antes disso
-                flash(f'Suas chances acabaram. A palavra era: {palavra}') # a pessoa perde o jogo
-                return redirect(url_for('index')) # e retorna ao index
-
-        session['letras_tentadas'] = letras_tentadas # salvamos as letras usadas em sua sessão
-
-    return render_template('jogo.html', palavra_escondida=''.join(palavra_escondida), dica=dica, chances=chances, letras_tentadas=letras_tentadas, quantidade=quantidade) # levamos todas essas variáveis para o html
-
-# roda o código
 if __name__ == '__main__':
     app.run(debug=True)

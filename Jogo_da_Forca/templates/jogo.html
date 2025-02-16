@@ -4,34 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo da Forca</title>
-    <link rel="stylesheet" href="{{ url_for ('static', filename='css/jogo.css')}}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jogo.css') }}">
 </head>
 <body>
-        <!-- Mostrar as mensagens flash -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% endwith %}
-    <!-- As chaves servem para implantarmos variáveis que são de outra linguagem, no nosso caso python -->
-    <h2>Dica da palavra: {{ dica }}</h2> <!-- Pega a variável dica que foi colhida nos argumentos da url e mostra para o usuário -->
-    <h2>{{ palavra_escondida }}</h2> <!-- A mesma coisa com a variável palavra_escondida -->
+
+    <!-- Exibir mensagens flash -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
+    <h2>Dica: {{ dica }}</h2>
+    <h2>{{ palavra_escondida }}</h2>
     <p>Quantidade de dígitos: {{ quantidade }}</p>
+    <p>Chances restantes: {{ chances }}</p>
+    <p>Letras tentadas: {{ ', '.join(letras_tentadas) }}</p>
+
     <br>
+
+    <!-- Formulário para tentativa de uma LETRA -->
     <form action="{{ url_for('jogo') }}" method="post">
         <label for="palpite">Digite uma letra:</label>
-        <input type="text" id="palpite" name="palpite" autocomplete="off"><br><br>
-        <button type="submit">Enviar</button>
-        <br><br><br>
-        <label for="chute">Digite a palavra:</label>
-        <input type="text" id="chute" name="chute" autocomplete="off"><br><br>
-        <button type="submit">Enviar</button>
+        <input type="text" id="palpite" name="palpite" maxlength="1" autocomplete="off" required>
+        <button type="submit" name="tipo_palpite" value="letra">Enviar Letra</button>
     </form>
-    
+
+    <br>
+
+    <!-- Formulário para tentativa da PALAVRA -->
+    <form action="{{ url_for('jogo') }}" method="post">
+        <label for="chute">Chute a palavra:</label>
+        <input type="text" id="chute" name="chute" autocomplete="off" required>
+        <button type="submit" name="tipo_palpite" value="palavra">Chutar Palavra</button>
+    </form>
+
 </body>
 </html>
