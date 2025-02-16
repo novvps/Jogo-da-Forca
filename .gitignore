@@ -1,0 +1,2 @@
+# ignore arquivos relacionados às chaves de API
+.env
