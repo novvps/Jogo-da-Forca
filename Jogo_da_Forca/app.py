@@ -56,7 +56,7 @@ def jogo(): # definimos jogo
                     flash(f"Letra incorreta. Você tem {chances} chances restantes.") # alerta que a letra está incorreta e quantas restam
 
         elif tipo_palpite == 'palavra':  # Tentativa de adivinhar a palavra inteira, caso o valor que o submit enviou seja "palavra"
-            chute = request.form.get('chute', '').upper() # a pessoa vai chutar uma palavra lá no front (html) e o back pega esse chute e deixa maiúsculo
+            chute = request.form.get('palpite', '').upper() # a pessoa vai chutar uma palavra lá no front (html) e o back pega esse chute e deixa maiúsculo
 
             if chute == palavra: # caso o chute seja igual a palavra
                 flash(f"Parabéns! Você acertou a palavra: {palavra}") # o jogador recebe o flash de que ganhou e acertou a palavra, no final mostrando qual era
