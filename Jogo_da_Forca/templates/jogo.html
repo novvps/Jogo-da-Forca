@@ -27,21 +27,14 @@
 
     <br>
 
-    <!-- Formulário para tentativa de uma LETRA -->
     <form action="{{ url_for('jogo') }}" method="post">
-        <label for="palpite">Digite uma letra:</label>
-        <input type="text" id="palpite" name="palpite" maxlength="1" autocomplete="off" required>
+        <label for="palpite">Digite uma letra ou chute uma palavra:</label>
+        <input type="text" id="palpite" name="palpite" autocomplete="off" required>
+        <br>
         <button type="submit" name="tipo_palpite" value="letra">Enviar Letra</button>
-    </form>
-
-    <br>
-
-    <!-- Formulário para tentativa da PALAVRA -->
-    <form action="{{ url_for('jogo') }}" method="post">
-        <label for="chute">Chute a palavra:</label>
-        <input type="text" id="chute" name="chute" autocomplete="off" required>
         <button type="submit" name="tipo_palpite" value="palavra">Chutar Palavra</button>
     </form>
+
 
 </body>
 </html>
