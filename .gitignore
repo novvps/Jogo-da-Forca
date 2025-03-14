@@ -1,3 +1,4 @@
 # ignore arquivos relacionados às chaves de API
 .env
 .txt
+env/
