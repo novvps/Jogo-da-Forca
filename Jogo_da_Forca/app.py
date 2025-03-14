@@ -30,6 +30,7 @@ def jogo(): # definimos jogo
     palavra_escondida = session.get('palavra_escondida', []) 
     chances = session.get('chances', 0)
     letras_tentadas = session.get('letras_tentadas', [])
+    quantidade = len(palavra.replace(' ', ''))
 
     if not palavra or not dica: # se não tiver palavra e nem dica
         return redirect(url_for('index')) # redireciona de volta para o index, porque precisa desses elementos para jogar
@@ -83,7 +84,8 @@ def jogo(): # definimos jogo
         palavra_escondida=''.join(palavra_escondida), # colocamos as variáveis para serem passadas para o html do jogo.html
         dica=dica, 
         chances=chances, 
-        letras_tentadas=letras_tentadas
+        letras_tentadas=letras_tentadas,
+        quantidade=quantidade
     )
 
 # verificamos se é o main
